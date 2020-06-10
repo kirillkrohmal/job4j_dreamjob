@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Store {
     private static final Store INST = new Store();
+    private static final AtomicInteger POST_ID = new AtomicInteger();
+
 
     private Map<Integer, Post> posts = new ConcurrentHashMap<>();
     private Map<Integer, Candidate> candidates = new ConcurrentHashMap<>();
@@ -28,6 +30,17 @@ public class Store {
 
     public static Store instOf() {
         return INST;
+    }
+
+    public void save(Post post) {
+        if (post.getId() == 0) {
+            post.setId(POST_ID.incrementAndGet());
+        }
+        posts.put(post.getId(), post);
+    }
+
+    public Post findById(int id) {
+        return posts.get(id);
     }
 
     public Collection<Post> findAll() {
