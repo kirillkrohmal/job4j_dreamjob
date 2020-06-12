@@ -3,10 +3,7 @@ package ru.job4j.dream.store;
 import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Post;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,6 +38,10 @@ public class Store {
 
     public Post findById(int id) {
         return posts.get(id);
+    }
+
+    public Candidate findById2(int id) {
+        return candidates.get(id);
     }
 
 
