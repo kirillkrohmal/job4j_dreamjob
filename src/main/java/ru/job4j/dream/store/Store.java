@@ -33,8 +33,14 @@ public class Store {
     }
 
     public void save(Post post) {
-        post.setId(POST_ID.incrementAndGet());
+        if (post.getId() == 0) {
+            post.setId(POST_ID.incrementAndGet());
+        }
         posts.put(post.getId(), post);
+    }
+
+    public Post findById(int id) {
+        return posts.get(id);
     }
 
 
@@ -43,15 +49,11 @@ public class Store {
         candidates.put(candidate.getId(), candidate);
     }
 
-    public Post findById(int id) {
-        return posts.get(id);
-    }
-
-    public Collection<Post> findAll() {
-        return posts.values();
-    }
-
     public Collection<Candidate> findAllCandidates() {
         return candidates.values();
+    }
+
+    public Collection<Post> findAllPosts() {
+        return posts.values();
     }
 }
