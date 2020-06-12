@@ -16,6 +16,16 @@
         </servlet-mapping>
 
 
+        <servlet>
+            <servlet-name>CandidateServlet</servlet-name>
+            <servlet-class>ru.job4j.dream.servlet.CandidateServlet</servlet-class>
+        </servlet>
+        <servlet-mapping>
+            <servlet-name>CandidateServlet</servlet-name>
+            <url-pattern>/candidate/save2</url-pattern>
+        </servlet-mapping>
+
+
 
 
 </web-app>

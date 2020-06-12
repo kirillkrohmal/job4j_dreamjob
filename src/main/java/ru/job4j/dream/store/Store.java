@@ -37,6 +37,12 @@ public class Store {
         posts.put(post.getId(), post);
     }
 
+
+    public void save2(Candidate candidate) {
+        candidate.setId(POST_ID.incrementAndGet());
+        candidates.put(candidate.getId(), candidate);
+    }
+
     public Post findById(int id) {
         return posts.get(id);
     }
