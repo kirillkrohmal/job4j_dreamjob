@@ -1,0 +1,255 @@
+В это уроке мы познакомимся с возможностью servlet загружать файлы на сервер и отдавать их клиенту.
+
+Http протокол позволяет передавать файлы между клиентом и сервером.
+
+Давайте начнем с клиентской стороны. В html есть форма загрузки файла.
+
+<input type="file" name="file">
+В браузере она отобразится, как кнопка с выбором файла.
+
+Давайте сделаем форму с вводом файла.
+
+<form action="<%=request.getContextPath()%>/upload" method="post" enctype="multipart/form-data">
+    <div class="checkbox">
+        <input type="file" name="file">
+    </div>
+    <button type="submit" class="btn btn-default">Submit</button>
+</form>
+
+
+Полный код upload.jsp можно найти ниже.
+
+<%@ page language="java" pageEncoding="UTF-8" session="true"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Upload</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <table class="table">
+        <thead>
+        <tr>
+            <th>URL</th>
+            <th>View</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${images}" var="image" varStatus="status">
+            <tr valign="top">
+                <td><a href="${pageContext.servletContext.contextPath}/download?name=${image}">Download</a></td>
+                <td>
+                    <img src="${pageContext.servletContext.contextPath}/download?name=${image}" width="100px" height="100px"/>
+                </td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+    <h2>Upload image</h2>
+    <form action="<%=request.getContextPath()%>/upload" method="post" enctype="multipart/form-data">
+        <div class="checkbox">
+            <input type="file" name="file">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+
+</body>
+</html>
+Теперь нам нужно реализовать два servlet.
+
+Первоначально нам нужно прописать их в web.xml
+
+<servlet>
+    <servlet-name>UploadServlet</servlet-name>
+    <servlet-class>ru.job4j.servlets.UploadServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>UploadServlet</servlet-name>
+    <url-pattern>/upload</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>DownloadServlet</servlet-name>
+    <servlet-class>ru.job4j.servlets.DownloadServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>DownloadServlet</servlet-name>
+    <url-pattern>/download</url-pattern>
+</servlet-mapping>
+Чтобы удобно обработать файл в servlet нам нужно подключить к проекту библиотеку apache-upload.
+
+<dependency>
+    <groupId>commons-fileupload</groupId>
+    <artifactId>commons-fileupload</artifactId>
+    <version>1.4</version>
+</dependency>
+Теперь давайте рассмотрим класс UploadServlet. Это servlet будет обрабатывать загрузку файла на сервер.
+
+package ru.job4j.servlets;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UploadServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List<String> images = new ArrayList<>();
+        for (File name : new File("images").listFiles()) {
+            images.add(name.getName());
+        }
+        req.setAttribute("images", images);
+        RequestDispatcher dispatcher = req.getRequestDispatcher("/upload.jsp");
+        dispatcher.forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        ServletContext servletContext = this.getServletConfig().getServletContext();
+        File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+        factory.setRepository(repository);
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        try {
+            List<FileItem> items = upload.parseRequest(req);
+            File folder = new File("images");
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+            for (FileItem item : items) {
+                if (!item.isFormField()) {
+                    File file = new File(folder + File.separator + item.getName());
+                    try (FileOutputStream out = new FileOutputStream(file)) {
+                        out.write(item.getInputStream().readAllBytes());
+                    }
+                }
+            }
+        } catch (FileUploadException e) {
+            e.printStackTrace();
+        }
+        doGet(req, resp);
+    }
+}
+Порядок загрузки файла на сервер.
+
+1. Вначале мы создаем фабрику по которой можем понять, какие данные есть в запросы. Данные могу быть: поля или файлы.
+
+2. Получаем список всех данных в запросе.
+
+List<FileItem> items = upload.parseRequest(req);
+3. Если элемент не поле, то это файл и из него можно прочитать весь входной поток и записать его в файл или напрямую в базу данных.
+
+                    File file = new File(folder + File.separator + item.getName());
+                    try (FileOutputStream out = new FileOutputStream(file)) {
+                        out.write(item.getInputStream().readAllBytes());
+                    }
+4. После этого мы переходим в метод doGet, где отдаем список всех файлов. В этом списке содержатся только имена.
+
+        for (File name : new File("images").listFiles()) {
+            images.add(name.getName());
+        }
+        req.setAttribute("images", images);
+Теперь давайте рассмотрим servlet - DownloadServlet.
+
+package ru.job4j.servlets;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class DownloadServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String name = req.getParameter("name");
+        resp.setContentType("name=" + name);
+        resp.setContentType("image/png");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + name + "\"");
+        File file = new File("images" + File.separator + name);
+        try (FileInputStream in = new FileInputStream(file)) {
+            resp.getOutputStream().write(in.readAllBytes());
+        }
+    }
+}
+Здесь кода совсем мало.
+
+1. Мы выставляем заголовок ответа в протоколе. Таким образом мы сообщаем браузеру, что будем отправлять файл.
+
+2. Открываем поток и записываем его в выходной поток servlet.
+
+resp.getOutputStream().write(in.readAllBytes());
+Давайте схематично изобразим процесс загрузки и скачивания файлов.
+
+Загрузка файла и полей.
+
+
+
+Скачивание файла.
+
+
+
+Давайте проанализируем, что происходит при отображении таблицы с картинками.
+
+В браузере откроем инструмент разработчика и закладку Network.
+
+В нашей таблице есть три картинки.
+
+
+
+
+
+Это значит, что браузер сделает три запроса на сервер к сервлету DownloadServlet. чтобы отобразить эти картинки.
+
+Что мы и видим в панели разработчика.
+
+
+
+Если мы кликнем на ссылку Download, то браузер сохранит этот файл. как картинку.
+
+Обратите внимание, что ссылки на скачивание и отображения одинаковы.
+
+                <td><a href="${pageContext.servletContext.contextPath}/download?name=${image}">Download</a></td>
+                <td>
+                    <img src="${pageContext.servletContext.contextPath}/download?name=${image}" width="100px" height="100px"/>
+                </td>
+Задание.
+
+1. К пользователям нужно добавить поле photoId.
+
+2. Это поле должно содержать имя файла с картинкой.
+
+3. Загрузка картинки производиться на форму добавления пользователя.
+
+4. Отображение картинки должно быть в таблице списка пользователей.
+
+5. Добавьте возможность скачивать картинки отдельно.
+
+6. Файл должен храниться на файловой системе. в папке bin/images/
+
+7. При удалении пользователя нужно удалять его картинку тоже.
