@@ -32,7 +32,7 @@ public class PsqlStore implements StoreInt {
         }
         pool.setDriverClassName(cfg.getProperty("jdbc.driver"));
         pool.setUrl(cfg.getProperty("jdbc.url"));
-        pool.setUsername(cfg.getProperty("jd,bc.username"));
+        pool.setUsername(cfg.getProperty("jdbc.username"));
         pool.setPassword(cfg.getProperty("jdbc.password"));
         pool.setMinIdle(5);
         pool.setMaxIdle(10);
