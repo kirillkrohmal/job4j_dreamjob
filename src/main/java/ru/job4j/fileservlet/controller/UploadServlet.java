@@ -22,39 +22,8 @@ import java.util.List;
 public class UploadServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List<String> images = new ArrayList<>();
-        for (File name : new File("C://bin/images").listFiles()) {
-            images.add(name.getName());
-        }
-        req.setAttribute("images", images);
-        RequestDispatcher dispatcher = req.getRequestDispatcher("WEB-INF/fileservlet/upload.jsp");
-        dispatcher.forward(req, resp);
-    }
+        req.setCharacterEncoding("UTF-8");
+        resp.sendRedirect(req.getContextPath() + "/upload.jsp");
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-        ServletContext servletContext = this.getServletConfig().getServletContext();
-        File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-        factory.setRepository(repository);
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        try {
-            List<FileItem> items = upload.parseRequest(req);
-            File folder = new File("images");
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
-            for (FileItem item : items) {
-                if (!item.isFormField()) {
-                    File file = new File(folder + File.separator + item.getName());
-                    try (FileOutputStream out = new FileOutputStream(file)) {
-                        out.write(item.getInputStream().read());
-                    }
-                }
-            }
-        } catch (FileUploadException e) {
-            e.printStackTrace();
-        }
-        doGet(req, resp);
     }
 }
