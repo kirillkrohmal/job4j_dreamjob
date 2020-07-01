@@ -12,7 +12,6 @@ public class Store {
     private static final Store INST = new Store();
     private static final AtomicInteger POST_ID = new AtomicInteger();
 
-
     private Map<Integer, Post> posts = new ConcurrentHashMap<>();
     private Map<Integer, Candidate> candidates = new ConcurrentHashMap<>();
 
@@ -36,6 +35,21 @@ public class Store {
         posts.put(post.getId(), post);
     }
 
+    public void add(Post post) {
+        if (post.getId() == 0) {
+            post.setId(POST_ID.incrementAndGet());
+        }
+        posts.put(post.getId(), post);
+    }
+
+    public void get(Post post) {
+        if (post.getId() == 0) {
+            post.setId(POST_ID.incrementAndGet());
+        }
+
+        posts.get(post.getId());
+    }
+
     public Post findById(int id) {
         return posts.get(id);
     }
@@ -48,6 +62,17 @@ public class Store {
     public void save2(Candidate candidate) {
         candidate.setId(POST_ID.incrementAndGet());
         candidates.put(candidate.getId(), candidate);
+    }
+
+
+    public void add2(Candidate candidate) {
+        candidate.setId(POST_ID.incrementAndGet());
+        candidates.put(candidate.getId(), candidate);
+    }
+
+    public void get2(Candidate candidate) {
+        candidate.setId(POST_ID.incrementAndGet());
+        candidates.get(candidate.getId());
     }
 
     public Collection<Candidate> findAllCandidates() {
