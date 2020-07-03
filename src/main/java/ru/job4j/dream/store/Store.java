@@ -1,5 +1,6 @@
 package ru.job4j.dream.store;
 
+import ru.job4j.auth.model.User;
 import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Post;
 
@@ -81,5 +82,8 @@ public class Store {
 
     public Collection<Post> findAllPosts() {
         return posts.values();
+    }
+
+    public void findByEmail(User user) {
     }
 }
