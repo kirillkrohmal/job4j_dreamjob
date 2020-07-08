@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class UserServlet extends HttpServlet {
-    //private final Validate logic = Validate.getInstance();
+    private final Validate logic = ValidateService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -17,11 +17,11 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        /*this.logic.add(
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        this.logic.add(
                 new User(0, req.getParameter("name"))
         );
-        this.doGet(req, resp);*/
+        this.doGet(req, resp);
     }
 }
 

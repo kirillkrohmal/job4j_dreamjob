@@ -85,5 +85,8 @@ public class Store {
     }
 
     public void findByEmail(User user) {
+
+
+
     }
 }
