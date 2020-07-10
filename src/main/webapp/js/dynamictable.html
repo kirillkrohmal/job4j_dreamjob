@@ -8,18 +8,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script>
-        function validate() {
+        function addRow() {
             var id = $('#id').val();
             var name = $('#usr').val();
-            var password = $('#pwd').val();
-            var lastname = $('#lastname').val();
-            var sex = $('#sex').val();
             var description = $('#description').val();
 
             $.ajax({
                 dataType: 'text'
             }).done(function (data) {
-                $('table tr:last').after('<tr><td>' + id + '</td><td>' + name + '</td><td>' + password + '</td><td>' + lastname + '</td><td>' + sex + '</td><td>' + '</td><td>' + description + '</tr></td>');
+                $('table tr:last').after('<tr><td>' + id + '</td><td>' + name + '</td><td>' + description + '</tr></td>');
             }).fail(function (err) {
                 alert($('#usr').attr('Заполните поля'));
             })
@@ -29,8 +26,8 @@
 <body>
 
 <div class="container">
-    <h2>Form control: input</h2>
-    <p>The form below contains two input elements; one of type text and one of type password:</p>
+    <h2>Form control</h2>
+    <p>The form below contains input elements</p>
     <form>
         <div class="form-group">
             <label for="name">Id:</label>
@@ -41,47 +38,29 @@
             <input type="text" class="form-control" title="Enter user name." id="usr">
         </div>
         <div class="form-group">
-            <label for="pwd">Password:</label>
-            <input type="password" class="form-control" id="pwd">
-        </div>
-        <div class="form-group">
-            <label for="lastname">Lastname:</label>
-            <input type="text" class="form-control" id="lastname">
-        </div>
-        <div class="form-group">
-            <label><input type="radio" id="sex" name="sex" value="man"> Man</label>
-            <label><input type="radio" id="sex" name="sex" value="woman"> Woman</label>
-        </div>
-        <div class="form-group">
             <label for="description">Description:</label>
             <input type="text" class="form-control" id="description">
         </div>
         <div class="checkbox">
             <label><input type="checkbox">Remember me</label>
         </div>
-        <button type="button" class="btn btn-default" onclick="return validate();">Submit</button>
+        <button type="button" class="btn btn-default" onclick="return addRow();">Submit</button>
     </form>
 </div>
 
 <div class="container">
     <h2>Table</h2>
     <p>Your choice:</p>
-    <table class="table">
+    <table id='table' class="table">
         <thead>
         <tr>
             <th>Id</th>
             <th>Name</th>
-            <th>Password</th>
-            <th>Lastname</th>
-            <th>Sex</th>
             <th>Description</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
             <td></td>
             <td></td>
             <td></td>
