@@ -1,10 +1,13 @@
 package ru.job4j.dream.store;
 
+import org.apache.taglibs.standard.lang.jstl.Literal;
 import ru.job4j.auth.model.User;
 import ru.job4j.dream.model.Candidate;
 import ru.job4j.dream.model.Post;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,6 +18,7 @@ public class Store {
 
     private Map<Integer, Post> posts = new ConcurrentHashMap<>();
     private Map<Integer, Candidate> candidates = new ConcurrentHashMap<>();
+    private List<User> vacancy = new ArrayList<>();
 
     private Store() {
         posts.put(1, new Post(1, "Junior Java Job"));
@@ -84,8 +88,10 @@ public class Store {
         return posts.values();
     }
 
-    public void findByEmail(User user) {
-
+    public void findByEmail(User users) {
+        for (User user : vacancy) {
+            user.getEmail();
+        }
 
 
     }
